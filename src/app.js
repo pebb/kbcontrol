@@ -1,58 +1,81 @@
-/**
- * Welcome to Pebble.js!
- *
- * This is where you write your app.
- */
-
 var UI = require('ui');
 var Vector2 = require('vector2');
+var ajax = require('ajax');
 
-var main = new UI.Card({
-  title: 'Pebble.js',
-  icon: 'images/menu_icon.png',
-  subtitle: 'Hello World!',
-  body: 'Press any button.'
+// Create the Window
+var window = new UI.Window();
+
+// Create a background Rect
+var bgRect = new UI.Rect({
+  position: new Vector2(0, 0),
+  size: new Vector2(134, 80),
+  backgroundColor: 'black'
 });
 
-main.show();
+// Add Rect to Window
+window.add(bgRect);
 
-main.on('click', 'up', function(e) {
-  var menu = new UI.Menu({
-    sections: [{
-      items: [{
-        title: 'Pebble.js',
-        icon: 'images/menu_icon.png',
-        subtitle: 'Can do Menus'
-      }, {
-        title: 'Second Item',
-        subtitle: 'Subtitle Text'
-      }]
-    }]
+// Create Left Text
+var leftText = new UI.Text({
+  position: new Vector2(0, 0),
+  size: new Vector2(144, 30),
+  text: "Left",
+  font: 'gothic-18-bold',
+  color: 'white',
+  textAlign: 'right'
+});
+
+// Create select Text
+var selectText = new UI.Text({
+  position: new Vector2(0, 55),
+  size: new Vector2(144, 30),
+  text: "Select/Fire",
+  font: 'gothic-18-bold',
+  color: 'white',
+  textAlign: 'right'
+});
+
+// Create select Text
+var rightText = new UI.Text({
+  position: new Vector2(0, 110),
+  size: new Vector2(144, 30),
+  text: "Right",
+  font: 'gothic-18-bold',
+  color: 'white',
+  textAlign: 'right'
+});
+
+// Add the TimeText
+window.add(leftText);
+window.add(selectText);
+window.add(rightText);
+
+window.on('click', function(e) {
+  
+  var key;
+  
+  if(e.button == 'up') {
+      key = 'L';
+  } else if(e.button == 'down' ) {
+      key = 'R';
+  } else {
+    key = 'C';
+  }
+  
+  var URL = 'http://192.168.1.234/' + key;
+  
+  ajax(
+  {
+    url: URL
+  },
+  function(data, status, request) {
+    console.log('Sent key');
+  },
+  function(error, status, request) {
+    console.log('The ajax request failed: ' + error);
   });
-  menu.on('select', function(e) {
-    console.log('Selected item #' + e.itemIndex + ' of section #' + e.sectionIndex);
-    console.log('The item is titled "' + e.item.title + '"');
-  });
-  menu.show();
+    
 });
 
-main.on('click', 'select', function(e) {
-  var wind = new UI.Window();
-  var textfield = new UI.Text({
-    position: new Vector2(0, 50),
-    size: new Vector2(144, 30),
-    font: 'gothic-24-bold',
-    text: 'Text Anywhere!',
-    textAlign: 'center'
-  });
-  wind.add(textfield);
-  wind.show();
-});
-
-main.on('click', 'down', function(e) {
-  var card = new UI.Card();
-  card.title('A Card');
-  card.subtitle('Is a Window');
-  card.body('The simplest window type in Pebble.js.');
-  card.show();
-});
+// Show the Window
+window.show();
